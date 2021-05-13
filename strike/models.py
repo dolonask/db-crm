@@ -1,9 +1,22 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 from django.db import models
 from crispy_forms.bootstrap import Tab, TabHolder
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
+
+
+class TradeUnion(models.Model):
+    value = models.CharField("Значение", max_length=100, blank=False)
+    visible = models.BooleanField("Видимый", default=False)
+
+    def __str__(self):
+        return self.value
+
+    class Meta:
+        verbose_name = "Есть ли на предприятии профсоюз"
+        verbose_name = "Есть ли на предприятии профсоюзы"
+
 
 class OwnerShipType(models.Model):
     name = models.CharField("Название", max_length=255)
@@ -98,24 +111,6 @@ class Source(models.Model):
         verbose_name_plural = "Источники"
 
 
-class Company(models.Model):
-    name = models.CharField("Название предприятия (юридического лица)", max_length=100)
-
-    company_ownership_type = models.ForeignKey(OwnerShipType, on_delete=models.DO_NOTHING, null=True, blank=True,
-                                               verbose_name="Форма собственности компании")
-
-    country_name = models.CharField("Страна происхождения компании", max_length=100)
-
-    company_is_tnk_member = models.BooleanField("Является ли эта кампания частью ТНК (Транснациональная компания)",
-                                                default=False)
-    company_tnk_name = models.CharField("Название ТНК (Транснациональная компания)",
-                                        max_length=100, null=True, blank=True)
-    count_workers = models.ForeignKey("NumberChoices", on_delete=models.DO_NOTHING,
-                                      null=True, blank=True,
-                                      related_name="count_workers",
-                                      verbose_name='Общая численность работников на предприятии')
-
-
 class Card(models.Model):
     ANSWER = [
         ("+", "Да"),
@@ -132,20 +127,35 @@ class Card(models.Model):
     region = models.ForeignKey(Region, on_delete=models.DO_NOTHING, verbose_name="Регион")
     city_name = models.CharField("Название города", max_length=100)
 
-    company = models.OneToOneField(to=Company, on_delete=models.DO_NOTHING)
+    company_name = models.CharField("Название предприятия (юридического лица)", max_length=100, blank=False)
+
+    company_ownership_type = models.ForeignKey(OwnerShipType, on_delete=models.DO_NOTHING, null=True, blank=True,
+                                               verbose_name="Форма собственности компании")
+
+    company_country_name = models.CharField("Страна происхождения компании", max_length=100, blank=True)
+
+    company_is_tnk_member = models.BooleanField("Является ли эта кампания частью ТНК (Транснациональная компания)",
+                                                default=False)
+    company_tnk_name = models.CharField("Название ТНК (Транснациональная компания)",
+                                        max_length=100, null=True, blank=True)
+    company_employees_count = models.ForeignKey("NumberChoices", on_delete=models.DO_NOTHING,
+                                                null=True, blank=True,
+                                                related_name="employees_count",
+                                                verbose_name='Общая численность работников на предприятии')
 
     count_strike_participants = models.ForeignKey(NumberChoices, on_delete=models.DO_NOTHING,
                                                   related_name="count_strike_participants",
                                                   verbose_name="Количество участников забастовки/акции")
-    card_demand_category = models.ManyToManyField(DemandCategory, verbose_name="Характер требований")
-    date_strike_start = models.DateTimeField("Дата начало проведения забастовки/акции",
-                                             default=datetime(year=2020, month=1, day=1, hour=8, tzinfo=timezone.utc))
-    data_strike_end = models.DateTimeField("Дата конца проведения забастовки/акции",
-                                           default=datetime(year=2020, month=1, day=1, hour=12, tzinfo=timezone.utc))
+    card_demand_categories = models.ManyToManyField(DemandCategory, verbose_name="Характер требований")
+
+    start_date = models.DateTimeField("Дата начало проведения забастовки/акции",
+                                      default=datetime.now())
+    end_date = models.DateTimeField("Дата конца проведения забастовки/акции",
+                                    default=datetime.now())
+
     has_trade_union = models.CharField("Профсоюз", choices=ANSWER, max_length=50, blank=False, default='+')
-    card_create_date = models.DateTimeField("Дата начала", auto_now_add=True)
-    card_end_date = models.DateTimeField("Дата завершения", default=datetime(year=2999,
-                                                                             month=1, day=1, tzinfo=timezone.utc))
+    card_create_date = models.DateTimeField("Дата создания карточки", auto_now_add=True)
+
     last_update = models.DateTimeField("Дата последнего изменения", auto_now=True)
     is_active = models.BooleanField("Активен", default=True)
 

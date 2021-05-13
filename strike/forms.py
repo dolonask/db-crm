@@ -31,12 +31,12 @@ class CardForm(ModelForm):
         #           'duration', 'meeting_requirements', 'story', 'reasons_for_strike', 'change_number_participants',
         #           'initiators_and_participants', 'state_position', 'results_so_far', 'additional_information']
 
-        # fields = '__all__'
+        fields = '__all__'
 
-        fields = [
-            'name', 'card_sources', 'source_url', 'source_content', 'country', 'region','city_name', 'company',
-            'company_ownership_type'
-        ]
+        # fields = [
+        #     'name', 'card_sources', 'source_url', 'source_content', 'country', 'region','city_name',
+        #     'company_ownership_type'
+        # ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-select'}),
             'card_sources': forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-list-none', 'id': 'card_sources'}),
@@ -51,16 +51,26 @@ class CardForm(ModelForm):
             'source_content': forms.Textarea(attrs={'class': 'form-control', 'id': 'source_con'}),
 
             'city_name': forms.TextInput(attrs={'class': 'form-select'}),
-            'company': forms.TextInput(attrs={'class': 'form-select'}),
-            'company_ownership_type': forms.Select(attrs={'class': 'form-control', 'id': 'company_ownership_type'}),
-            'company_country': forms.Select(
-                attrs={'class': 'form-control', 'style': 'display: none', 'id': 'company_country'}),
+            'company_name': forms.TextInput(attrs={'class': 'form-control'}),
+
+            'company_ownership_type': forms.Select(attrs={'class': 'form-select', 'id': 'company_ownership_type'}),
+            'company_country_name': forms.TextInput(
+                attrs={'class': 'form-control', 'id': 'company_country'}),
             'company_is_tnk_member': forms.CheckboxInput(
-                attrs={'class': 'form-check-label', 'style': 'display: none', 'id': 'company_is_tnk_member'}),
-            'company_tnk_name': forms.TextInput(attrs={'class': 'form-select'}),
-            'count_workers': forms.Select(attrs={'class': 'form-control'}),
-            'count_strike_participants': forms.Select(attrs={'class': 'form-control'}),
-            'data_strike_end': forms.DateTimeInput(),
+                attrs={'class': 'form-check-label', 'id': 'company_is_tnk_member'}),
+            'company_tnk_name': forms.TextInput(attrs={'class': 'form-control'}),
+
+
+            'company_employees_count': forms.Select(attrs={'class': 'form-select'}),
+            'count_strike_participants': forms.Select(attrs={'class': 'form-select'}),
+
+            'card_demand_categories': forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-list-none', 'id': 'card_demands'}),
+
+
+            'start_date': forms.DateInput(format=('%m/%d/%Y'), attrs={'class':'form-control', 'placeholder':'Выберите дату', 'type':'date'}),
+            'end_date': forms.DateInput(format=('%m/%d/%Y'), attrs={'class':'form-control', 'placeholder':'Выберите дату', 'type':'date'}),
+
+
             'has_trade_union': forms.Select(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-label'}),
             'trade_union': forms.TextInput(attrs={'class': 'form-select'}),
